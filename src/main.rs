@@ -14,6 +14,47 @@ fn window_conf() -> Conf {
     }
 }
 
+/*
+    p1 -- near point
+    p2 -- far point
+*/
+fn draw_crease(
+    p1: Vec3,
+    p2: Vec3,
+    texture: &Texture2D,
+) {
+    let gl = unsafe { get_internal_gl().quad_gl };
+    let color = WHITE;
+
+    let p1 = Vec3 { x: p1.x - 0.03, ..p1 };
+    let p2 = Vec3 { x: p2.x - 0.03, ..p2 };
+
+    #[rustfmt::skip]
+    let vertices = [
+        Vertex::new(p2.x, p2.y, p2.z,  1.0,  1.0, color),
+        Vertex::new(p1.x, p1.y, p1.z, 0.0, 1.0, color),
+        Vertex::new(p1.x + 0.07, p1.y, p1.z,  0.0, 0.0, color),
+        Vertex::new(p2.x + 0.07, p2.y, p2.z, 1.0,  0.0, color),
+    ];
+    let indices: [u16; 6] = [0, 1, 2, 2, 3, 0];
+    // let indices: [u16; 3] = [0, 1, 2];
+    // let indices: [u16; 3] = [1, 2, 3];
+
+    // gl.texture(None);
+    gl.texture(Some(texture));
+    gl.draw_mode(DrawMode::Triangles);
+    gl.geometry(&vertices, &indices);
+    // let uv = [0., 0.];
+    // let indices = [0, 1];
+    // let line = [
+    //     ([p1.x, p1.y, p1.z], uv, RED.into()),
+    //     ([p2.x, p2.y, p2.z], uv, BLUE.into()),
+    // ];
+    // gl.texture(None);
+    // gl.draw_mode(DrawMode::Lines);
+    // gl.geometry(&line[..], &indices);
+}
+
 fn draw_floor_crease(
     crease: &Texture2D,
 ) {
@@ -30,7 +71,8 @@ fn draw_floor_crease(
     /* left crease */
     let p1 = lwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: wall_size.y });
     let p2 = lwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z: wall_size.y });
-    draw_line_3d(p1, p2, BLACK);
+    // draw_line_3d(p1, p2, BLACK);
+    draw_crease(p1, p2, crease);
 
     /* back crease */
     let p1 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: wall_size.y });
@@ -165,6 +207,7 @@ async fn main() {
     ];
     let wall = load_texture("assets/wall.png").await.unwrap();
     let wall_crease = load_texture("assets/wall_crease.png").await.unwrap();
+    // let wall_crease = load_texture("assets/boxy.png").await.unwrap();
 
     let material = load_material(
         ShaderSource::Glsl {
