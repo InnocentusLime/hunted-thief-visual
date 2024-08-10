@@ -8,11 +8,56 @@ fn window_conf() -> Conf {
         window_height: 900,
         window_width: 1600,
         fullscreen: true,
+        high_dpi: true,
         ..Default::default()
     }
 }
 
-fn draw_map(stuff: &[Texture2D], wall: &Texture2D) {
+fn draw_floor_crease(
+    crease: &Texture2D,
+) {
+    let lwmat = Mat4::from_translation(Vec3 { x: -TILE_SIZE - 1.0, y: 0.7, z: 0.5 - TILE_SIZE + 1.0 })
+            .mul_mat4(&Mat4::from_rotation_x(std::f32::consts::FRAC_PI_2))
+            .mul_mat4(&Mat4::from_rotation_z(-std::f32::consts::FRAC_PI_2));
+    let rwmat = Mat4::from_translation(Vec3 { x: -TILE_SIZE + 1.0, y: 0.7, z: 0.5 - TILE_SIZE + 1.0 })
+            .mul_mat4(&Mat4::from_rotation_x(std::f32::consts::FRAC_PI_2))
+            .mul_mat4(&Mat4::from_rotation_z(-std::f32::consts::FRAC_PI_2));
+    let bwmat = Mat4::from_translation(Vec3 { x: -TILE_SIZE, y: 0.7, z: 0.5 - TILE_SIZE })
+            .mul_mat4(&Mat4::from_rotation_x(std::f32::consts::FRAC_PI_2));
+    let wall_size = Vec2 { x: 1.0, y: 0.7 };
+
+    /* left crease */
+    let p1 = lwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: wall_size.y });
+    let p2 = lwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z: wall_size.y });
+    draw_line_3d(p1, p2, BLACK);
+
+    /* back crease */
+    let p1 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: wall_size.y });
+    let p2 = bwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z:  wall_size.y });
+    draw_line_3d(p1, p2, BLACK);
+
+    /* right crease */
+    let p1 = rwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
+    let p2 = rwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z:  wall_size.y });
+    draw_line_3d(p1, p2, BLACK);
+
+    /* rb crease */
+    let p1 = bwmat.transform_point3(Vec3 { x: wall_size.x, y: 0.0, z: -wall_size.y });
+    let p2 = bwmat.transform_point3(Vec3 { x: wall_size.x, y: 0.0, z:  wall_size.y });
+    draw_line_3d(p1, p2, BLACK);
+
+    /* lb crease */
+    let p1 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: -wall_size.y });
+    let p2 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
+    draw_line_3d(p1, p2, BLACK);
+
+    // /* right corner */
+    // let p1 = mat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: -wall_size.y });
+    // let p2 = mat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
+    // draw_line_3d(p1, p2, BLACK);
+}
+
+fn draw_map(stuff: &[Texture2D], wall: &Texture2D, crease: &Texture2D) {
     let idx = |x: u32, y: u32| ((x << 16) ^ y) % (stuff.len() as u32);
 
     for y in 0..10 {
@@ -36,6 +81,8 @@ fn draw_map(stuff: &[Texture2D], wall: &Texture2D) {
     }
 
     let gl = unsafe { get_internal_gl().quad_gl };
+
+    /* Back wall */
     gl.push_model_matrix(
         Mat4::from_translation(Vec3 { x: -TILE_SIZE, y: 0.7, z: 0.5 - TILE_SIZE })
             .mul_mat4(&Mat4::from_rotation_x(std::f32::consts::FRAC_PI_2))
@@ -48,6 +95,7 @@ fn draw_map(stuff: &[Texture2D], wall: &Texture2D) {
     );
     gl.pop_model_matrix();
 
+    /* Left wall */
     gl.push_model_matrix(
         Mat4::from_translation(Vec3 { x: -TILE_SIZE - 1.0, y: 0.7, z: 0.5 - TILE_SIZE + 1.0 })
             .mul_mat4(&Mat4::from_rotation_x(std::f32::consts::FRAC_PI_2))
@@ -61,6 +109,7 @@ fn draw_map(stuff: &[Texture2D], wall: &Texture2D) {
     );
     gl.pop_model_matrix();
 
+    /* Right wall */
     gl.push_model_matrix(
         Mat4::from_translation(Vec3 { x: -TILE_SIZE + 1.0, y: 0.7, z: 0.5 - TILE_SIZE + 1.0 })
             .mul_mat4(&Mat4::from_rotation_x(std::f32::consts::FRAC_PI_2))
@@ -73,6 +122,31 @@ fn draw_map(stuff: &[Texture2D], wall: &Texture2D) {
         WHITE
     );
     gl.pop_model_matrix();
+
+    // set_default_camera();
+    // draw_texture_ex(
+    //     crease,
+    //     0.0,
+    //     680.0,
+    //     WHITE,
+    //     DrawTextureParams {
+    //         rotation: 40.0 * std::f32::consts::PI / 180.0,
+    //         ..Default::default()
+    //     }
+    // );
+
+    // gl.push_model_matrix(
+    //     Mat4::from_translation(Vec3 { x: -1.0*TILE_SIZE - 1.0, y: 0.0, z: 0.5 - TILE_SIZE + 1.0 })
+    //         .mul_mat4(&Mat4::from_rotation_y(0.95 * -std::f32::consts::FRAC_PI_2))
+    // );
+    // draw_plane(
+    //     Vec3 { x: 0.0, y: 0.0, z: 0.0 },
+    //     Vec2 { x: 1.0, y: 0.04 },
+    //     Some(crease),
+    //     WHITE
+    // );
+    // gl.pop_model_matrix();
+    draw_floor_crease(crease);
 }
 
 #[macroquad::main(window_conf)]
@@ -89,6 +163,7 @@ async fn main() {
         load_texture("assets/grass6.png").await.unwrap(),
     ];
     let wall = load_texture("assets/wall.png").await.unwrap();
+    let wall_crease = load_texture("assets/wall_crease.png").await.unwrap();
 
     let material = load_material(
         ShaderSource::Glsl {
@@ -142,6 +217,9 @@ async fn main() {
 
         set_camera(&cam);
 
+        let gl = unsafe { get_internal_gl().quad_gl };
+        gl.depth_test(false);
+
         // set_camera(&Camera3D {
         //     position: vec3(-20., 15., 0.),
         //     up: vec3(0., 1., 0.),
@@ -150,7 +228,7 @@ async fn main() {
         // });
         // draw_plane(vec3(-8., 0., -8.), vec2(5., 5.), None, WHITE);
 
-        draw_map(&floor, &wall);
+        draw_map(&floor, &wall, &wall_crease);
         // drawing to the texture
 
         // 0..100, 0..100 camera
