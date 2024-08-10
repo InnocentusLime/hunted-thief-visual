@@ -9,6 +9,7 @@ fn window_conf() -> Conf {
         window_width: 1600,
         fullscreen: true,
         high_dpi: true,
+        sample_count: 2,
         ..Default::default()
     }
 }
