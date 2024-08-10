@@ -77,22 +77,27 @@ fn draw_floor_crease(
     /* back crease */
     let p1 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: wall_size.y });
     let p2 = bwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z:  wall_size.y });
-    draw_line_3d(p1, p2, BLACK);
+    // draw_line_3d(p1, p2, RED);
+    // let p1 = Vec3
+    draw_crease(p2, p1, crease);
 
     /* right crease */
     let p1 = rwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
     let p2 = rwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z:  wall_size.y });
-    draw_line_3d(p1, p2, BLACK);
+    // draw_line_3d(p1, p2, BLACK);
+    draw_crease(p1, p2, crease);
 
     /* rb crease */
     let p1 = bwmat.transform_point3(Vec3 { x: wall_size.x, y: 0.0, z: -wall_size.y });
     let p2 = bwmat.transform_point3(Vec3 { x: wall_size.x, y: 0.0, z:  wall_size.y });
-    draw_line_3d(p1, p2, BLACK);
+    // draw_line_3d(p1, p2, BLACK);
+    draw_crease(p1, p2, crease);
 
     /* lb crease */
     let p1 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: -wall_size.y });
     let p2 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
-    draw_line_3d(p1, p2, BLACK);
+    // draw_line_3d(p1, p2, BLACK);
+    draw_crease(p1, p2, crease);
 
     // /* right corner */
     // let p1 = mat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: -wall_size.y });
