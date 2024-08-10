@@ -37,22 +37,10 @@ fn draw_crease(
         Vertex::new(p2.x + 0.07, p2.y, p2.z, 1.0,  0.0, color),
     ];
     let indices: [u16; 6] = [0, 1, 2, 2, 3, 0];
-    // let indices: [u16; 3] = [0, 1, 2];
-    // let indices: [u16; 3] = [1, 2, 3];
 
-    // gl.texture(None);
     gl.texture(Some(texture));
     gl.draw_mode(DrawMode::Triangles);
     gl.geometry(&vertices, &indices);
-    // let uv = [0., 0.];
-    // let indices = [0, 1];
-    // let line = [
-    //     ([p1.x, p1.y, p1.z], uv, RED.into()),
-    //     ([p2.x, p2.y, p2.z], uv, BLUE.into()),
-    // ];
-    // gl.texture(None);
-    // gl.draw_mode(DrawMode::Lines);
-    // gl.geometry(&line[..], &indices);
 }
 
 fn draw_floor_crease(
