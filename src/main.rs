@@ -206,7 +206,7 @@ async fn main() {
         load_texture("assets/grass5.png").await.unwrap(),
         load_texture("assets/grass6.png").await.unwrap(),
     ];
-    let wall = load_texture("assets/wall.png").await.unwrap();
+    let wall = load_texture("assets/wall2.png").await.unwrap();
     let wall_crease = load_texture("assets/wall_crease.png").await.unwrap();
     // let wall_crease = load_texture("assets/boxy.png").await.unwrap();
 
