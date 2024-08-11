@@ -425,11 +425,9 @@ uniform sampler2D lightTex;
 
 void main() {
     float lightRange = 3.2;
-    float lightAim = 1.7;
-    vec3 lightOff = (lightPos - fragPos) * vec3(1.0/lightRange, 1.2, 1.0/lightRange);
-    vec3 lightOff2 = (lightPos - fragPos) * vec3(1.0/lightAim, 1.0, 1.0/lightAim);
+    vec3 lightOff = (lightPos - fragPos) * vec3(1.0/lightRange, 1.0/lightRange, 1.0/lightRange);
+    vec3 lightOff2 = lightOff;
 
-    // float absorb = 0.8;
     vec3 lightDir = normalize(lightOff);
     vec3 NfragNormal = normalize(fragNormal);
     float Diff = clamp(dot(NfragNormal, lightDir), 0.0, 1.0);
@@ -439,34 +437,24 @@ void main() {
         dot(normalize(fragUp), lightOff2),
         dot(normalize(fragRight), lightOff2)
     ) + vec2(0.5, 0.5);
-    // vec2 lightP = vec2(lightOff2.xz) + vec2(0.5, 0.5);
     lightP.x = clamp(lightP.x, 0.0, 1.0);
     lightP.y = clamp(lightP.y, 0.0, 1.0);
 
     float l = length(texture2D(lightTex, lightP).xyz);
     vec2 ll = vec2(l, length(lightOff.y));
-    // vec2 ll = vec2(length(lightOff.xz), length(lightOff.y));
     float lightDist = length(ll);
     float dist = 1.0 - clamp(lightDist, 0.0, 1.0);
-    // if (fragPos.y > 0.9) {
-    //     dist = 0.0;
-    // }
     float mixK = 0.33;
     float mixK2 = 0.08;
     float lightLevel = dist * Diff;
     vec3 light = vec3(255.0 / 255.0, 95.0 / 255.0, 0.0);
     vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0);
-    // shadow = shadow * mixK2 + (1 - mixK2) * vec3(1.0, 1.0, 1.0);
     light = light * mixK + (1 - mixK) * vec3(1.0, 1.0, 1.0);
 
     vec4 tex = texture2D(Texture, uv);
     vec3 lightTex = lightLevel * light * tex.xyz;
     vec3 shadowTex = (1 - lightLevel) * shadow * mixK2;
     gl_FragColor = vec4(lightTex + shadowTex, tex.w);
-
-    // gl_FragColor = vec4(dist * Diff, dist * Diff, dist * Diff, 1.0);
-    // gl_FragColor = Diff * color * texture2D(Texture, uv);
-    // gl_FragColor = vec4(fragPos, 1.0);
 }"#;
 
 const HT_VERT: &'static str = r#"#version 100
