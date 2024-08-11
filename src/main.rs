@@ -291,15 +291,15 @@ async fn main() {
             lz += 0.1;
         }
 
-        // clear_background(BLACK);
-        clear_background(
-            Color::new(
-                72.0 / 255.0 * 0.08,
-                133.0 / 255.0 * 0.08,
-                218.0 / 255.0 * 0.08,
-                1.0
-            )
-        );
+        clear_background(BLACK);
+        // clear_background(
+        //     Color::new(
+        //         72.0 / 255.0 * 0.08,
+        //         133.0 / 255.0 * 0.08,
+        //         218.0 / 255.0 * 0.08,
+        //         1.0
+        //     )
+        // );
 
         let mut cam: Camera3D = Default::default();
         cam.aspect = Some(1600.0 / 900.0);
@@ -439,8 +439,8 @@ vec4 bigLight() {
 
     // Light Texture
     vec2 lightP = vec2(
-        dot(normalize(fragUp), lightOff),
-        dot(normalize(fragRight), lightOff)
+        dot(normalize(fragUp) / 3.0, lightOff),
+        dot(normalize(fragRight) / 3.0, lightOff)
     ) + vec2(0.5, 0.5);
     lightP.x = clamp(lightP.x, 0.0, 1.0);
     lightP.y = clamp(lightP.y, 0.0, 1.0);
@@ -454,12 +454,12 @@ vec4 bigLight() {
     intense = min(intense, intensityCap);
 
     // Colors
-    vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.6;
+    vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.4;
     vec4 tex = texture2D(Texture, uv);
 
     // Final mixing
     float lightLevel = lightPix * intense * Diff;
-    vec3 lightTex = lightLevel * tex.xyz * shadow;
+    vec3 lightTex = tex.xyz * (lightLevel * shadow);
     return vec4(lightTex, tex.w);
 }
 
