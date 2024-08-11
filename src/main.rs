@@ -317,7 +317,7 @@ async fn main() {
         gl.depth_test(false);
 
         gl_use_material(&material);
-        material.set_uniform("lightPos", vec3(lx, 0.25, lz));
+        material.set_uniform("lightPos", vec3(lx, 0.13, lz));
 
         // set_camera(&Camera3D {
         //     position: vec3(-20., 15., 0.),
@@ -424,8 +424,8 @@ void main() {
     vec3 NfragNormal = normalize(fragNormal);
     float Diff = clamp(dot(NfragNormal, lightDir), 0.0, 1.0);
 
-    float lightDist = length(lightOff);
-
+    vec2 ll = vec2(length(lightOff.xz), length(lightOff.y));
+    float lightDist = length(ll);
     float dist = 1.0 - clamp(lightDist, 0.0, 1.0);
     // if (fragPos.y > 0.9) {
     //     dist = 0.0;
