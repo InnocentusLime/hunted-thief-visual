@@ -429,19 +429,18 @@ vec4 bigLight() {
 
     // Light Infi
     vec3 lightOff = (lightPos - fragPos);
-    vec3 lightOff2 = lightOff;
     vec3 lightDir = normalize(lightOff);
     float lightDist = length(lightOff);
     vec3 NfragNormal = normalize(fragNormal);
 
     // How did we hit the fragment
     float Diff = clamp(dot(NfragNormal, lightDir), 0.0, 1.0);
-    vec3 lightOff2N = dot(NfragNormal, lightOff2) * NfragNormal;
+    vec3 lightOff2N = dot(NfragNormal, lightOff) * NfragNormal;
 
     // Light Texture
     vec2 lightP = vec2(
-        dot(normalize(fragUp), lightOff2),
-        dot(normalize(fragRight), lightOff2)
+        dot(normalize(fragUp), lightOff),
+        dot(normalize(fragRight), lightOff)
     ) + vec2(0.5, 0.5);
     lightP.x = clamp(lightP.x, 0.0, 1.0);
     lightP.y = clamp(lightP.y, 0.0, 1.0);
