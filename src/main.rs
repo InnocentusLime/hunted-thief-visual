@@ -287,7 +287,15 @@ async fn main() {
             lz += 0.1;
         }
 
-        clear_background(BLACK);
+        // clear_background(BLACK);
+        clear_background(
+            Color::new(
+                72.0 / 255.0 * 0.08,
+                133.0 / 255.0 * 0.08,
+                218.0 / 255.0 * 0.08,
+                1.0
+            )
+        );
 
         let mut cam: Camera3D = Default::default();
         cam.aspect = Some(1600.0 / 900.0);
@@ -309,7 +317,7 @@ async fn main() {
         gl.depth_test(false);
 
         gl_use_material(&material);
-        material.set_uniform("lightPos", vec3(lx, 0.5, lz));
+        material.set_uniform("lightPos", vec3(lx, 0.25, lz));
 
         // set_camera(&Camera3D {
         //     position: vec3(-20., 15., 0.),
@@ -408,19 +416,32 @@ uniform lowp vec3 lightPos;
 uniform sampler2D Texture;
 
 void main() {
-    vec3 lightOff = lightPos - fragPos;
+    float lightRange = 3.2;
+    vec3 lightOff = (lightPos - fragPos) * vec3(1.0/lightRange, 1.2, 1.0/lightRange);
 
-    float absorb = 0.8;
+    // float absorb = 0.8;
     vec3 lightDir = normalize(lightOff);
     vec3 NfragNormal = normalize(fragNormal);
     float Diff = clamp(dot(NfragNormal, lightDir), 0.0, 1.0);
 
-    float lightRange = 3.0;
-    float dist = 1.0 - clamp(length(lightOff) / lightRange, 0.0, 1.0);
-    float lightLevel = absorb * dist * Diff;
+    float lightDist = length(lightOff);
+
+    float dist = 1.0 - clamp(lightDist, 0.0, 1.0);
+    // if (fragPos.y > 0.9) {
+    //     dist = 0.0;
+    // }
+    float mixK = 0.33;
+    float mixK2 = 0.08;
+    float lightLevel = dist * Diff;
+    vec3 light = vec3(255.0 / 255.0, 95.0 / 255.0, 0.0);
+    vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0);
+    // shadow = shadow * mixK2 + (1 - mixK2) * vec3(1.0, 1.0, 1.0);
+    light = light * mixK + (1 - mixK) * vec3(1.0, 1.0, 1.0);
 
     vec4 tex = texture2D(Texture, uv);
-    gl_FragColor = vec4(lightLevel * tex.xyz, tex.w);
+    vec3 lightTex = lightLevel * light * tex.xyz;
+    vec3 shadowTex = (1 - lightLevel) * shadow * mixK2;
+    gl_FragColor = vec4(lightTex + shadowTex, tex.w);
 
     // gl_FragColor = vec4(dist * Diff, dist * Diff, dist * Diff, 1.0);
     // gl_FragColor = Diff * color * texture2D(Texture, uv);
