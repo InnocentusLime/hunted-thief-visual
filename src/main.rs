@@ -454,7 +454,7 @@ vec4 bigLight() {
     intense = min(intense, intensityCap);
 
     // Colors
-    vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.4;
+    vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.3;
     vec4 tex = texture2D(Texture, uv);
 
     // Final mixing
