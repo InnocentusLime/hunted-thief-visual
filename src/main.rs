@@ -416,6 +416,8 @@ varying lowp vec4 color;
 varying lowp vec2 uv;
 varying lowp vec3 fragPos;
 varying lowp vec3 fragNormal;
+varying lowp vec3 fragUp;
+varying lowp vec3 fragRight;
 
 uniform lowp vec3 lightPos;
 uniform sampler2D Texture;
@@ -432,7 +434,12 @@ void main() {
     vec3 NfragNormal = normalize(fragNormal);
     float Diff = clamp(dot(NfragNormal, lightDir), 0.0, 1.0);
 
-    vec2 lightP = vec2(lightOff2.xz) + vec2(0.5, 0.5);
+    vec3 lightOff2N = dot(NfragNormal, lightOff2) * NfragNormal;
+    vec2 lightP = vec2(
+        dot(normalize(fragUp), lightOff2),
+        dot(normalize(fragRight), lightOff2)
+    ) + vec2(0.5, 0.5);
+    // vec2 lightP = vec2(lightOff2.xz) + vec2(0.5, 0.5);
     lightP.x = clamp(lightP.x, 0.0, 1.0);
     lightP.y = clamp(lightP.y, 0.0, 1.0);
 
@@ -472,6 +479,8 @@ varying lowp vec3 fragPos;
 varying lowp vec2 uv;
 varying lowp vec4 color;
 varying lowp vec3 fragNormal;
+varying lowp vec3 fragUp;
+varying lowp vec3 fragRight;
 
 uniform vec3 Normal;
 uniform mat4 Model;
@@ -540,7 +549,11 @@ void main() {
     fragPos = worldPos.xyz;
     color = color0 / 255.0;
     uv = texcoord;
-    fragNormal = mat3(transpose(inverse(Model))) * Normal;
+
+    mat3 fragTf = mat3(transpose(inverse(Model)));
+    fragNormal = fragTf * Normal;
+    fragUp = fragTf * vec3(0.0, 0.0, -1.0);
+    fragRight = fragTf * vec3(1.0, 0.0, 0.0);
 }
 "#;
 
