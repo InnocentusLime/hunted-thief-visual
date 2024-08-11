@@ -212,6 +212,7 @@ async fn main() {
     let pos_buffer = render_target(1600, 900);
     pos_buffer.texture.set_filter(FilterMode::Nearest);
 
+    let light = load_texture("assets/light4.png").await.unwrap();
     let floor = [
         load_texture("assets/grass1.png").await.unwrap(),
         load_texture("assets/grass2.png").await.unwrap(),
@@ -230,6 +231,9 @@ async fn main() {
             fragment: HT_FRAG,
         },
         MaterialParams {
+            textures: vec![
+                "lightTex".to_string()
+            ],
             uniforms: vec![
                 ("lightPos".to_string(), UniformType::Float3),
                 ("Normal".to_string(), UniformType::Float3),
@@ -317,6 +321,7 @@ async fn main() {
         gl.depth_test(false);
 
         gl_use_material(&material);
+        material.set_texture("lightTex", light.clone());
         material.set_uniform("lightPos", vec3(lx, 0.13, lz));
 
         // set_camera(&Camera3D {
@@ -414,17 +419,26 @@ varying lowp vec3 fragNormal;
 
 uniform lowp vec3 lightPos;
 uniform sampler2D Texture;
+uniform sampler2D lightTex;
 
 void main() {
     float lightRange = 3.2;
+    float lightAim = 1.7;
     vec3 lightOff = (lightPos - fragPos) * vec3(1.0/lightRange, 1.2, 1.0/lightRange);
+    vec3 lightOff2 = (lightPos - fragPos) * vec3(1.0/lightAim, 1.0, 1.0/lightAim);
 
     // float absorb = 0.8;
     vec3 lightDir = normalize(lightOff);
     vec3 NfragNormal = normalize(fragNormal);
     float Diff = clamp(dot(NfragNormal, lightDir), 0.0, 1.0);
 
-    vec2 ll = vec2(length(lightOff.xz), length(lightOff.y));
+    vec2 lightP = vec2(lightOff2.xz) + vec2(0.5, 0.5);
+    lightP.x = clamp(lightP.x, 0.0, 1.0);
+    lightP.y = clamp(lightP.y, 0.0, 1.0);
+
+    float l = length(texture2D(lightTex, lightP).xyz);
+    vec2 ll = vec2(l, length(lightOff.y));
+    // vec2 ll = vec2(length(lightOff.xz), length(lightOff.y));
     float lightDist = length(ll);
     float dist = 1.0 - clamp(lightDist, 0.0, 1.0);
     // if (fragPos.y > 0.9) {
