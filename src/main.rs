@@ -212,7 +212,7 @@ async fn main() {
     let pos_buffer = render_target(1600, 900);
     pos_buffer.texture.set_filter(FilterMode::Nearest);
 
-    let light = load_texture("assets/light5.png").await.unwrap();
+    let light = load_texture("assets/light6.png").await.unwrap();
     let floor = [
         load_texture("assets/grass1.png").await.unwrap(),
         load_texture("assets/grass2.png").await.unwrap(),
@@ -437,15 +437,6 @@ vec4 bigLight() {
     float Diff = clamp(dot(NfragNormal, lightDir), 0.0, 1.0);
     vec3 lightOff2N = dot(NfragNormal, lightOff) * NfragNormal;
 
-    // Light Texture
-    vec2 lightP = vec2(
-        dot(normalize(fragUp) / 3.0, lightOff),
-        dot(normalize(fragRight) / 3.0, lightOff)
-    ) + vec2(0.5, 0.5);
-    lightP.x = clamp(lightP.x, 0.0, 1.0);
-    lightP.y = clamp(lightP.y, 0.0, 1.0);
-    float lightPix = length(texture2D(lightTex, lightP).xyz);
-
     // Light Intensity
     float intense = 0.0;
     if (lightDist > 0.0) {
@@ -453,13 +444,22 @@ vec4 bigLight() {
     }
     intense = min(intense, intensityCap);
 
+    // Light Texture
+    vec2 lightP = vec2(
+        dot(normalize(fragUp) * intense, lightOff),
+        dot(normalize(fragRight) * intense, lightOff)
+    ) + vec2(0.5, 0.5);
+    lightP.x = clamp(lightP.x, 0.0, 1.0);
+    lightP.y = clamp(lightP.y, 0.0, 1.0);
+    float lightPix = length(texture2D(lightTex, lightP).xyz);
+
     // Colors
-    vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.3;
+    // vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.3;
     vec4 tex = texture2D(Texture, uv);
 
     // Final mixing
     float lightLevel = lightPix * intense * Diff;
-    vec3 lightTex = tex.xyz * (lightLevel * shadow);
+    vec3 lightTex = tex.xyz * (lightLevel);
     return vec4(lightTex, tex.w);
 }
 
