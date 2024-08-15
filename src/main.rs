@@ -279,16 +279,16 @@ async fn main() {
             ty -= 0.1;
         }
         if is_key_down(KeyCode::Left) {
-            lx -= 0.1;
+            lx -= 0.02;
         }
         if is_key_down(KeyCode::Right) {
-            lx += 0.1;
+            lx += 0.02;
         }
         if is_key_down(KeyCode::Up) {
-            lz -= 0.1;
+            lz -= 0.02;
         }
         if is_key_down(KeyCode::Down) {
-            lz += 0.1;
+            lz += 0.02;
         }
 
         clear_background(BLACK);
