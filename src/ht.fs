@@ -34,31 +34,46 @@ vec3 spotLight(float a, float b) {
     // cfg
     vec3 spotPos = vec3(0.0, 2.0, 1.5);
     spotPos = lightPos;
-    spotPos.y = 1.5;
-    vec3 spotDir = vec3(0.0, -1.0, 0.0);
-    vec3 spotToFrag = normalize(fragPos - spotPos);
+    spotPos.y = 1.0;
+    spotPos.y = 1.2;
+
+
+    vec3 v = vec3(0.0, -1.0, 0.0);
+    vec3 p = fragPos - spotPos;
+
     vec3 lightOff = spotPos - fragPos;
     vec3 NfragNormal = normalize(fragNormal);
     float lightDist = length(lightOff);
-    // float ac = 0.4;
-    float ac = 0.6;
+    float ac = 0.3;
+    // float ac = 0.6;
 
     // compute
     float intense = 0.0;
-    if (dot(spotToFrag, spotDir) > ac) {
-        float Diff = clamp(dot(NfragNormal, -spotToFrag), 0.0, 1.0);
+    if (dot(normalize(p), v) > ac) {
+        float Diff = clamp(dot(NfragNormal, -p), 0.0, 1.0);
 
-        // intense = 1.0 / (1.0 + a * lightDist + b * lightDist * lightDist);
+        intense = 1.0 / (1.0 + a * lightDist + b * lightDist * lightDist);
 
-        // TODO: div by zero
-        vec3 h = (dot(spotToFrag, NfragNormal) / dot(spotDir, NfragNormal)) * spotDir;
-        vec3 r = spotToFrag - h;
+        vec3 h = (dot(p, v) / dot(v, v)) * v;
+        vec3 r = p - h;
 
-        float k = (ac - dot(h, NfragNormal)) / dot(r, NfragNormal);
-        intense = length(r) / 2.0;
+        float bc = sqrt(1 - ac*ac);
+        float b = (bc / ac) * length(h);
+        float k = length(r) / b;
+
+        float x = dot(normalize(r), fragRight) * k / 2.0 + 0.5;
+        float y = dot(normalize(r), fragUp) * k / 2.0 + 0.5;
+
+        x = (normalize(r) * k).x / 2.0 + 0.5;
+        y = 1.0 - ((normalize(r) * k).z / 2.0 + 0.5);
+        // return vec3(y);
+        // return vec3(x, y, 0.0);
+        // return vec3(1.0, 1.0, 0.0);
+        // return vec3(x, y, 0.0);
+        return texture2D(lightTex, vec2(x, y)).xyz * intense;
     }
 
-    float res = intense;
+    float res = 0.0;
     return vec3(res);
 }
 
@@ -80,7 +95,7 @@ vec3 global_shade(float a, float b) {
 }
 
 void main() {
-    gl_FragColor = vec4(spotLight(0.5, 0.5), 1.0);
+    gl_FragColor = vec4(spotLight(0.1, 0.01), 1.0) * texture2D(Texture, uv);
     // float l = length(texture2D(lightTex, lightP).xyz);
     // vec2 ll = vec2(l, length(lightOff.y));
     // float lightDist = length(ll);
