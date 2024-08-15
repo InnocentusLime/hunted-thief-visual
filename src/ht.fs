@@ -93,12 +93,11 @@ vec3 blend(vec3 a, vec3 b, float k) {
 
 void main() {
     vec3 light = vec3(255.0 / 255.0, 95.0 / 255.0, 0.0);
-    // vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.08;
     vec3 dark = vec3(7.0 / 255.0, 12.0 / 255.0, 17 / 255.0);
 
     float shadowMix = 0.5;
     vec4 spot = vec4(spotLight(0.1, 0.01, 0.3, vec3(lightPos.x, 1.2, lightPos.z)), 1.0);
-    // vec4 lantern = vec4(spotLight(0.1, 0.01, 0.35, lightPos), 1.0) * vec4(light, 1.0);
+    vec4 lantern = vec4(spotLight(0.1, 0.01, 0.35, lightPos), 1.0);
 
     vec4 final = spot * texture2D(Texture, uv);
     vec3 biglit = blend(darken(dark, final.xyz), final.rgb, 0.65);
