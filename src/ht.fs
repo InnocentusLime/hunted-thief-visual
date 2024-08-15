@@ -100,7 +100,10 @@ void main() {
     vec3 dark = vec3(7.0 / 255.0, 12.0 / 255.0, 17 / 255.0);
 
     float shadowMix = 0.5;
-    vec3 darkLight = spotLight(0.1, 0.01, 0.3, vec3(lightPos.x, 1.2, lightPos.z));
+    vec3 darkLightPos = vec3(0.0, 1.2, 1.5);
+    vec2 darkLightDelta = (lightPos.xz - darkLightPos.xz) * 0.3;
+
+    vec3 darkLight = spotLight(0.1, 0.01, 0.3, darkLightPos + vec3(darkLightDelta.x, 0.0, darkLightDelta.y));
     vec3 lantern = spotLight(0.1, 0.01, 0.35, vec3(lightPos.x, 0.3, lightPos.z));
 
     vec4 final = vec4(darkLight, 1.0) * texture2D(Texture, uv);
