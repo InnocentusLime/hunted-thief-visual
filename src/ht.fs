@@ -96,10 +96,10 @@ void main() {
     vec3 dark = vec3(7.0 / 255.0, 12.0 / 255.0, 17 / 255.0);
 
     float shadowMix = 0.5;
-    vec3 spot = spotLight(0.1, 0.01, 0.3, vec3(lightPos.x, 1.2, lightPos.z));
+    vec3 darkLight = spotLight(0.1, 0.01, 0.3, vec3(lightPos.x, 1.2, lightPos.z));
     vec3 lantern = spotLight(0.1, 0.01, 0.35, lightPos);
 
-    vec4 final = vec4(spot, 1.0) * texture2D(Texture, uv);
+    vec4 final = vec4(darkLight, 1.0) * texture2D(Texture, uv);
     vec3 biglit = blend(darken(dark, final.xyz), final.rgb, 0.65);
     gl_FragColor = vec4(biglit, final.w);
 
