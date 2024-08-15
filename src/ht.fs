@@ -105,9 +105,6 @@ void main() {
 
     vec4 final = vec4(darkLight, 1.0) * texture2D(Texture, uv);
     vec3 biglit = blend(darken(dark, final.rgb), final.rgb, min(0.65, 1 - length(lantern)));
-    // vec3 biglit = erase(vec3(0.0), lantern);
+    // biglit *= blend(light * lantern * biglit.rgb, biglit.rgb, min(0.33, length(lantern)));
     gl_FragColor = vec4(biglit, final.w);
-
-    // float lanBlend = 0.33;
-    // gl_FragColor = lantern * texture2D(Texture, uv);
 }
