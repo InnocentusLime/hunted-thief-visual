@@ -86,7 +86,7 @@ fn draw_floor_crease(
     let p1 = rwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
     let p2 = rwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z:  wall_size.y });
     // draw_line_3d(p1, p2, BLACK);
-    draw_crease(p1, p2, crease, Vec3 { x: 1.0, y: 0.0, z: 0.0 }, 0.03, material);
+    draw_crease(p1, p2, crease, Vec3 { x: 0.0, y: 1.0, z: 0.0 }, 0.03, material);
 
     /* rb crease */
     let p1 = bwmat.transform_point3(Vec3 { x: wall_size.x, y: 0.0, z: -wall_size.y });
@@ -320,9 +320,10 @@ async fn main() {
         let gl = unsafe { get_internal_gl().quad_gl };
         gl.depth_test(false);
 
+        let light_pos = vec3(lx, 0.3, lz);
         gl_use_material(&material);
         material.set_texture("lightTex", light.clone());
-        material.set_uniform("lightPos", vec3(lx, 0.13, lz));
+        material.set_uniform("lightPos", light_pos);
 
         // set_camera(&Camera3D {
         //     position: vec3(-20., 15., 0.),
@@ -367,6 +368,8 @@ async fn main() {
         // gl_use_default_material();
 
         gl_use_default_material();
+        draw_sphere(light_pos, 0.01, None, RED);
+        draw_line_3d(light_pos, Vec3 { y: 0.0, ..light_pos }, RED);
 
         set_default_camera();
 
@@ -410,66 +413,7 @@ async fn main() {
     }
 }
 
-const HT_FRAG: &'static str = r#"#version 100
-precision lowp float;
-varying lowp vec4 color;
-varying lowp vec2 uv;
-varying lowp vec3 fragPos;
-varying lowp vec3 fragNormal;
-varying lowp vec3 fragUp;
-varying lowp vec3 fragRight;
-
-uniform lowp vec3 lightPos;
-uniform sampler2D Texture;
-uniform sampler2D lightTex;
-
-vec4 bigLight() {
-    // Params
-    float intensityCap = 1.2;
-
-    // Light Infi
-    vec3 lightOff = (lightPos - fragPos);
-    vec3 lightDir = normalize(lightOff);
-    float lightDist = length(lightOff);
-    vec3 NfragNormal = normalize(fragNormal);
-
-    // How did we hit the fragment
-    float Diff = clamp(dot(NfragNormal, lightDir), 0.0, 1.0);
-    vec3 lightOff2N = dot(NfragNormal, lightOff) * NfragNormal;
-
-    // Light Intensity
-    float intense = 0.0;
-    if (lightDist > 0.0) {
-        intense = 1.0 / pow(lightDist, 2.0);
-    }
-    intense = min(intense, intensityCap);
-
-    // Light Texture
-    vec2 lightP = vec2(
-        dot(normalize(fragUp) * intense, lightOff),
-        dot(normalize(fragRight) * intense, lightOff)
-    ) + vec2(0.5, 0.5);
-    lightP.x = clamp(lightP.x, 0.0, 1.0);
-    lightP.y = clamp(lightP.y, 0.0, 1.0);
-    float lightPix = length(texture2D(lightTex, lightP).xyz);
-
-    // Colors
-    // vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.3;
-    vec4 tex = texture2D(Texture, uv);
-
-    // Final mixing
-    float lightLevel = lightPix * intense * Diff;
-    vec3 lightTex = tex.xyz * (lightLevel);
-    return vec4(lightTex, tex.w);
-}
-
-void main() {
-    // float l = length(texture2D(lightTex, lightP).xyz);
-    // vec2 ll = vec2(l, length(lightOff.y));
-    // float lightDist = length(ll);
-    // float dist = 1.0 - clamp(lightDist, 0.0, 1.0);
-    gl_FragColor = bigLight();
-}"#;
+const HT_FRAG: &'static str = include_str!("ht.fs");
 
 const HT_VERT: &'static str = r#"#version 100
 precision lowp float;
