@@ -87,6 +87,10 @@ vec3 darken(vec3 tint, vec3 target) {
     return clamp(tint / inv, vec3(0.0), vec3(1.0));
 }
 
+vec3 blend(vec3 a, vec3 b, float k) {
+    return k * a + (1 - k) * b;
+}
+
 void main() {
     vec3 light = vec3(255.0 / 255.0, 95.0 / 255.0, 0.0);
     // vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.08;
@@ -94,12 +98,12 @@ void main() {
 
     float shadowMix = 0.5;
     vec4 spot = vec4(spotLight(0.1, 0.01, 0.3, vec3(lightPos.x, 1.2, lightPos.z)), 1.0);
-    // vec4 ambient = vec4(shadow * shadowMix + vec3(1.0) * (1 - shadowMix), 1.0);
-    vec4 ambient = vec4(1.0);
+    // vec4 lantern = vec4(spotLight(0.1, 0.01, 0.35, lightPos), 1.0) * vec4(light, 1.0);
 
-    vec4 final = ambient * spot * texture2D(Texture, uv);
-    // float blend = 0.69;
-    float blend = 0.65;
-    gl_FragColor = vec4(darken(dark, final.xyz) * blend + final.xyz * (1 - blend), final.w);
-    // gl_FragColor = vec4(shadow, 1.0);
+    vec4 final = spot * texture2D(Texture, uv);
+    vec3 biglit = blend(darken(dark, final.xyz), final.rgb, 0.65);
+    gl_FragColor = vec4(biglit, final.w);
+
+    // float lanBlend = 0.33;
+    // gl_FragColor = lantern * texture2D(Texture, uv);
 }
