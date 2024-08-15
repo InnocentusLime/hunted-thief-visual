@@ -91,6 +91,10 @@ vec3 blend(vec3 a, vec3 b, float k) {
     return k * a + (1 - k) * b;
 }
 
+vec3 erase(vec3 a, vec3 b) {
+    return a * (1 - length(b)) + vec3(1.0) * length(b);
+}
+
 void main() {
     vec3 light = vec3(255.0 / 255.0, 95.0 / 255.0, 0.0);
     vec3 dark = vec3(7.0 / 255.0, 12.0 / 255.0, 17 / 255.0);
@@ -100,7 +104,8 @@ void main() {
     vec3 lantern = spotLight(0.1, 0.01, 0.35, lightPos);
 
     vec4 final = vec4(darkLight, 1.0) * texture2D(Texture, uv);
-    vec3 biglit = blend(darken(dark, final.xyz), final.rgb, 0.65);
+    vec3 biglit = blend(darken(dark, final.rgb), final.rgb, min(0.65, 1 - length(lantern)));
+    // vec3 biglit = erase(vec3(0.0), lantern);
     gl_FragColor = vec4(biglit, final.w);
 
     // float lanBlend = 0.33;
