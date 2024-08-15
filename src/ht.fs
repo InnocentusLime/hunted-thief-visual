@@ -30,22 +30,13 @@ vec3 pointLight(float a, float b) {
     return vec3(res);
 }
 
-vec3 spotLight(float a, float b) {
-    // cfg
-    vec3 spotPos = vec3(0.0, 2.0, 1.5);
-    spotPos = lightPos;
-    spotPos.y = 1.0;
-    spotPos.y = 1.2;
-
-
+vec3 spotLight(float a, float b, float ac, vec3 spotPos) {
     vec3 v = vec3(0.0, -1.0, 0.0);
     vec3 p = fragPos - spotPos;
 
     vec3 lightOff = spotPos - fragPos;
     vec3 NfragNormal = normalize(fragNormal);
     float lightDist = length(lightOff);
-    float ac = 0.3;
-    // float ac = 0.6;
 
     // compute
     float intense = 0.0;
@@ -66,10 +57,6 @@ vec3 spotLight(float a, float b) {
 
         x = (normalize(r) * k).x / 2.0 + 0.5;
         y = 1.0 - ((normalize(r) * k).z / 2.0 + 0.5);
-        // return vec3(y);
-        // return vec3(x, y, 0.0);
-        // return vec3(1.0, 1.0, 0.0);
-        // return vec3(x, y, 0.0);
         return texture2D(lightTex, vec2(x, y)).xyz * intense;
     }
 
@@ -94,13 +81,25 @@ vec3 global_shade(float a, float b) {
     return vec3(Diff);
 }
 
+vec3 darken(vec3 tint, vec3 target) {
+    vec3 inv = vec3(1.0) - target;
+    // return vec3(1.0) - (inv / tint);
+    return clamp(tint / inv, vec3(0.0), vec3(1.0));
+}
+
 void main() {
-    gl_FragColor = vec4(spotLight(0.1, 0.01), 1.0) * texture2D(Texture, uv);
-    // float l = length(texture2D(lightTex, lightP).xyz);
-    // vec2 ll = vec2(l, length(lightOff.y));
-    // float lightDist = length(ll);
-    // float dist = 1.0 - clamp(lightDist, 0.0, 1.0);
-    // gl_FragColor = bigLight();
-    // gl_FragColor = vec4(pointLight(0.5, 0.5), 1.0);
-    // gl_FragColor = vec4(global_shade(0.5, 0.5), 1.0);
+    vec3 light = vec3(255.0 / 255.0, 95.0 / 255.0, 0.0);
+    // vec3 shadow = vec3(72.0 / 255.0, 133.0 / 255.0, 218.0 / 255.0) * 0.08;
+    vec3 dark = vec3(7.0 / 255.0, 12.0 / 255.0, 17 / 255.0);
+
+    float shadowMix = 0.5;
+    vec4 spot = vec4(spotLight(0.1, 0.01, 0.3, vec3(lightPos.x, 1.2, lightPos.z)), 1.0);
+    // vec4 ambient = vec4(shadow * shadowMix + vec3(1.0) * (1 - shadowMix), 1.0);
+    vec4 ambient = vec4(1.0);
+
+    vec4 final = ambient * spot * texture2D(Texture, uv);
+    // float blend = 0.69;
+    float blend = 0.65;
+    gl_FragColor = vec4(darken(dark, final.xyz) * blend + final.xyz * (1 - blend), final.w);
+    // gl_FragColor = vec4(shadow, 1.0);
 }
