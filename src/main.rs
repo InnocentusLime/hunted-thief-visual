@@ -198,6 +198,7 @@ async fn main() {
             uniforms: vec![
                 ("lightPos".to_string(), UniformType::Float3),
                 ("Normal".to_string(), UniformType::Float3),
+                ("time".to_string(), UniformType::Float1),
             ],
             pipeline_params: PipelineParams {
                 depth_test: Comparison::Never,
@@ -220,7 +221,11 @@ async fn main() {
     let mut lx = 0.0;
     let mut lz = 1.5;
 
+    let mut t = 0.0f32;
+
     loop {
+        t += 0.01;
+
         if is_key_pressed(KeyCode::Escape) {
             break;
         }
@@ -288,7 +293,7 @@ async fn main() {
         gl_use_material(&material);
         material.set_texture("lightTex", light.clone());
         material.set_uniform("lightPos", light_pos);
-
+        material.set_uniform("time", t);
 
         draw_map(&floor, &wall, &wall_crease, &material);
 
