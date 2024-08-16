@@ -96,6 +96,8 @@ fn draw_map(
     wall: &Texture2D,
     crease: &Texture2D,
     material: &Material,
+    player: &Texture2D,
+    ppos: Vec3,
 ) {
     let idx = |x: u32, y: u32| ((x << 16) ^ y) % (stuff.len() as u32);
 
@@ -167,6 +169,21 @@ fn draw_map(
     gl.pop_model_matrix();
 
     draw_floor_crease(crease, material);
+
+    /* Player */
+    let player_height = 0.25;
+    material.set_uniform("Normal", vec3(0.0, 1.0, 0.0));
+    gl.push_model_matrix(
+        Mat4::from_translation(Vec3 { x: ppos.x, y: player_height, z: ppos.z })
+            .mul_mat4(&Mat4::from_rotation_x(std::f32::consts::FRAC_PI_2))
+    );
+    draw_plane(
+        Vec3 { x: 0.0, y: 0.0, z: 0.0 },
+        Vec2 { x: player_height, y: player_height },
+        Some(player),
+        WHITE
+    );
+    gl.pop_model_matrix();
 }
 
 #[macroquad::main(window_conf)]
@@ -185,6 +202,7 @@ async fn main() {
     ];
     let wall = load_texture("assets/wall2.png").await.unwrap();
     let wall_crease = load_texture("assets/wall_crease.png").await.unwrap();
+    let player = load_texture("assets/char.png").await.unwrap();
 
     let material = load_material(
         ShaderSource::Glsl {
@@ -295,11 +313,11 @@ async fn main() {
         material.set_uniform("lightPos", light_pos);
         material.set_uniform("time", t);
 
-        draw_map(&floor, &wall, &wall_crease, &material);
+        draw_map(&floor, &wall, &wall_crease, &material, &player, light_pos);
 
         gl_use_default_material();
-        draw_sphere(light_pos, 0.01, None, RED);
-        draw_line_3d(light_pos, Vec3 { y: 0.0, ..light_pos }, RED);
+        // draw_sphere(light_pos, 0.01, None, RED);
+        // draw_line_3d(light_pos, Vec3 { y: 0.0, ..light_pos }, RED);
 
         set_default_camera();
 
