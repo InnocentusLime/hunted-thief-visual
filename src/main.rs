@@ -29,14 +29,11 @@ fn draw_crease(
 ) {
     let gl = unsafe { get_internal_gl().quad_gl };
     let color = WHITE;
-    // let color = RED;
 
     let v1 = p1 - padding * ort;
     let v2 = p2 - padding * ort;
     let v3 = p2 + padding * ort;
     let v4 = p1 + padding * ort;
-    // let p1 = Vec3 { x: p1.x - 0.03, ..p1 };
-    // let p2 = Vec3 { x: p2.x - 0.03, ..p2 };
 
     #[rustfmt::skip]
     let vertices = [
@@ -50,7 +47,6 @@ fn draw_crease(
     material.set_uniform("Normal", ort.cross(p2 - p1).normalize_or_zero());
 
     gl.texture(Some(texture));
-    // gl.texture(None);
     gl.draw_mode(DrawMode::Triangles);
     gl.geometry(&vertices, &indices);
 }
@@ -72,38 +68,27 @@ fn draw_floor_crease(
     /* left crease */
     let p1 = lwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: wall_size.y });
     let p2 = lwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z: wall_size.y });
-    // draw_line_3d(p1, p2, BLACK);
     draw_crease(p1, p2, crease, Vec3 { x: 1.0, y: 0.0, z: 0.0 }, 0.03, material);
 
     /* back crease */
     let p1 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: wall_size.y });
     let p2 = bwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z:  wall_size.y });
-    // draw_line_3d(p1, p2, RED);
-    // let p1 = Vec3
     draw_crease(p1, p2, crease, Vec3 { x: 0.0, y: 0.0, z: 1.0 }, 0.06, material);
 
     /* right crease */
     let p1 = rwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
     let p2 = rwmat.transform_point3(Vec3 { x:  wall_size.x, y: 0.0, z:  wall_size.y });
-    // draw_line_3d(p1, p2, BLACK);
     draw_crease(p1, p2, crease, Vec3 { x: 0.0, y: 1.0, z: 0.0 }, 0.03, material);
 
     /* rb crease */
     let p1 = bwmat.transform_point3(Vec3 { x: wall_size.x, y: 0.0, z: -wall_size.y });
     let p2 = bwmat.transform_point3(Vec3 { x: wall_size.x, y: 0.0, z:  wall_size.y });
-    // draw_line_3d(p1, p2, BLACK);
     draw_crease(p2, p1, crease, Vec3 { x: 1.0, y: 0.0, z: 0.0 }, 0.03, material);
 
     /* lb crease */
     let p1 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: -wall_size.y });
     let p2 = bwmat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
-    // draw_line_3d(p1, p2, BLACK);
     draw_crease(p2, p1, crease, Vec3 { x: 1.0, y: 0.0, z: 0.0 }, 0.03, material);
-
-    // /* right corner */
-    // let p1 = mat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z: -wall_size.y });
-    // let p2 = mat.transform_point3(Vec3 { x: -wall_size.x, y: 0.0, z:  wall_size.y });
-    // draw_line_3d(p1, p2, BLACK);
 }
 
 fn draw_map(
@@ -181,29 +166,6 @@ fn draw_map(
     );
     gl.pop_model_matrix();
 
-    // set_default_camera();
-    // draw_texture_ex(
-    //     crease,
-    //     0.0,
-    //     680.0,
-    //     WHITE,
-    //     DrawTextureParams {
-    //         rotation: 40.0 * std::f32::consts::PI / 180.0,
-    //         ..Default::default()
-    //     }
-    // );
-
-    // gl.push_model_matrix(
-    //     Mat4::from_translation(Vec3 { x: -1.0*TILE_SIZE - 1.0, y: 0.0, z: 0.5 - TILE_SIZE + 1.0 })
-    //         .mul_mat4(&Mat4::from_rotation_y(0.95 * -std::f32::consts::FRAC_PI_2))
-    // );
-    // draw_plane(
-    //     Vec3 { x: 0.0, y: 0.0, z: 0.0 },
-    //     Vec2 { x: 1.0, y: 0.04 },
-    //     Some(crease),
-    //     WHITE
-    // );
-    // gl.pop_model_matrix();
     draw_floor_crease(crease, material);
 }
 
@@ -223,7 +185,6 @@ async fn main() {
     ];
     let wall = load_texture("assets/wall2.png").await.unwrap();
     let wall_crease = load_texture("assets/wall_crease.png").await.unwrap();
-    // let wall_crease = load_texture("assets/boxy.png").await.unwrap();
 
     let material = load_material(
         ShaderSource::Glsl {
@@ -308,7 +269,6 @@ async fn main() {
         let mut cam: Camera3D = Default::default();
         cam.aspect = Some(1600.0 / 900.0);
         cam.position = Vec3 { x: 0.0, y, z };
-        // cam.position = Vec3 { x: 0.0, y: 1.5, z: 1.5 };
         cam.fovy = 30.0;
         cam.target = Vec3 { x: 0.0, y: ty, z: 0.0 };
         cam.projection = Projection::Perspective;
@@ -329,47 +289,8 @@ async fn main() {
         material.set_texture("lightTex", light.clone());
         material.set_uniform("lightPos", light_pos);
 
-        // set_camera(&Camera3D {
-        //     position: vec3(-20., 15., 0.),
-        //     up: vec3(0., 1., 0.),
-        //     target: vec3(0., 0., 0.),
-        //     ..Default::default()
-        // });
-        // draw_plane(vec3(-8., 0., -8.), vec2(5., 5.), None, WHITE);
 
         draw_map(&floor, &wall, &wall_crease, &material);
-        // drawing to the texture
-
-        // 0..100, 0..100 camera
-        // set_camera(&Camera2D {
-        //     zoom: vec2(0.01, 0.01),
-        //     target: vec2(0.0, 0.0),
-        //     render_target: Some(render_target.clone()),
-        //     ..Default::default()
-        // });
-
-        // clear_background(LIGHTGRAY);
-        // draw_line(-30.0, 45.0, 30.0, 45.0, 3.0, BLUE);
-        // draw_circle(-45.0, -35.0, 20.0, YELLOW);
-        // draw_circle(45.0, -35.0, 20.0, GREEN);
-
-        // // drawing to the screen
-
-        // set_default_camera();
-
-        // clear_background(WHITE);
-        // gl_use_material(&material);
-        // draw_texture_ex(
-        //     &render_target.texture,
-        //     0.,
-        //     0.,
-        //     WHITE,
-        //     DrawTextureParams {
-        //         dest_size: Some(vec2(screen_width(), screen_height())),
-        //         ..Default::default()
-        //     },
-        // );
-        // gl_use_default_material();
 
         gl_use_default_material();
         draw_sphere(light_pos, 0.01, None, RED);
@@ -506,70 +427,3 @@ void main() {
     fragRight = fragTf * vec3(1.0, 0.0, 0.0);
 }
 "#;
-
-const CRT_FRAGMENT_SHADER: &'static str = r#"#version 100
-precision lowp float;
-
-varying vec4 color;
-varying vec2 uv;
-
-uniform sampler2D Texture;
-
-// https://www.shadertoy.com/view/XtlSD7
-
-vec2 CRTCurveUV(vec2 uv)
-{
-    uv = uv * 2.0 - 1.0;
-    vec2 offset = abs( uv.yx ) / vec2( 6.0, 4.0 );
-    uv = uv + uv * offset * offset;
-    uv = uv * 0.5 + 0.5;
-    return uv;
-}
-
-void DrawVignette( inout vec3 color, vec2 uv )
-{
-    float vignette = uv.x * uv.y * ( 1.0 - uv.x ) * ( 1.0 - uv.y );
-    vignette = clamp( pow( 16.0 * vignette, 0.3 ), 0.0, 1.0 );
-    color *= vignette;
-}
-
-
-void DrawScanline( inout vec3 color, vec2 uv )
-{
-    float iTime = 0.1;
-    float scanline 	= clamp( 0.95 + 0.05 * cos( 3.14 * ( uv.y + 0.008 * iTime ) * 240.0 * 1.0 ), 0.0, 1.0 );
-    float grille 	= 0.85 + 0.15 * clamp( 1.5 * cos( 3.14 * uv.x * 640.0 * 1.0 ), 0.0, 1.0 );
-    color *= scanline * grille * 1.2;
-}
-
-void main() {
-    vec2 crtUV = CRTCurveUV(uv);
-    vec3 res = texture2D(Texture, uv).rgb * color.rgb;
-    if (crtUV.x < 0.0 || crtUV.x > 1.0 || crtUV.y < 0.0 || crtUV.y > 1.0)
-    {
-        res = vec3(0.0, 0.0, 0.0);
-    }
-    DrawVignette(res, crtUV);
-    DrawScanline(res, uv);
-    gl_FragColor = vec4(res, 1.0);
-
-}
-"#;
-
-const CRT_VERTEX_SHADER: &'static str = "#version 100
-attribute vec3 position;
-attribute vec2 texcoord;
-attribute vec4 color0;
-
-varying lowp vec2 uv;
-varying lowp vec4 color;
-
-uniform mat4 Model;
-uniform mat4 Projection;
-
-void main() {
-    gl_Position = Projection * Model * vec4(position, 1);
-    color = color0 / 255.0;
-    uv = texcoord;
-}
-";
