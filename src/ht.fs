@@ -98,11 +98,12 @@ void main() {
     vec3 darkLightPos = vec3(0.0, 1.2, 1.5);
     vec2 darkLightDelta = (lightPos.xz - darkLightPos.xz) * 0.3;
 
-    vec3 darkLight = spotLight(0.1, 0.01, 0.3, darkLightPos + vec3(darkLightDelta.x, 0.0, darkLightDelta.y));
+    vec3 darkLight = spotLight(0.1, 0.1, 0.3, darkLightPos + vec3(darkLightDelta.x, 0.0, darkLightDelta.y));
     vec3 lantern = spotLight(0.1, 0.01, 0.42, vec3(lightPos.x, 0.3, lightPos.z));
 
     vec4 final = vec4(darkLight, 1.0) * texture2D(Texture, uv);
     vec3 biglit = blend(darken(dark, final.rgb), final.rgb, min(0.65, 1 - length(lantern)));
+    // TODO: improve the blending stuff
     biglit = blend(light * lantern * biglit.rgb, biglit.rgb, min(0.33, length(lantern * lantern)));
     gl_FragColor = vec4(biglit, final.w);
 }
