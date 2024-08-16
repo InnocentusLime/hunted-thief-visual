@@ -24,7 +24,7 @@ float randomF(float x) {
         43758.5453123);
 }
 
-vec3 sampleLightTex(vec2 uv) {
+vec3 sampleLightTex(vec2 uv, bool shif) {
     float innK = 0.4;
     float wideK = 0.6;
     float brightSc = 0.55;
@@ -33,7 +33,9 @@ vec3 sampleLightTex(vec2 uv) {
 
     vec2 uvShear = vec2(randomF(time), randomF(time + 0.23) - 0.5) * 0.02;
     vec2 uvShear2 = vec2(randomF(time + 0.12) - 0.5, randomF(time + 0.4) - 0.5) * 0.02;
-    innK += (randomF(time) - 0.5) * 0.05;
+    if (shif) {
+        innK += (randomF(time) - 0.5) * 0.05;
+    }
 
     uv = uv + uvShear.yx * uv;
     uv2 = uv2 + uvShear2.yx * uv2;
@@ -68,7 +70,7 @@ vec3 spotLight(float a, float b, float ac, vec3 spotPos) {
         x = (normalize(r) * k).x / 2.0 + 0.5;
         y = 1.0 - ((normalize(r) * k).z / 2.0 + 0.5);
         // return texture2D(lightTex, vec2(x, y)).xyz * intense;
-        return sampleLightTex(vec2(x, y)) * intense;
+        return sampleLightTex(vec2(x, y), ac > 0.3) * intense;
     }
 
     float res = 0.0;
