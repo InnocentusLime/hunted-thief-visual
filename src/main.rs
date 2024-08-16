@@ -260,6 +260,10 @@ async fn main() {
     let mut lz = 1.5;
 
     loop {
+        if is_key_pressed(KeyCode::Escape) {
+            break;
+        }
+
         if is_key_pressed(KeyCode::Q) {
             y += 0.1;
         }
