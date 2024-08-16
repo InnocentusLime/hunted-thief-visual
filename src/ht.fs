@@ -10,6 +10,18 @@ varying lowp vec3 fragRight;
 uniform lowp vec3 lightPos;
 uniform sampler2D Texture;
 uniform sampler2D lightTex;
+uniform float lightTwitch;
+
+vec3 sampleLightTex(vec2 uv) {
+    float innK = 0.4;
+    float wideK = 0.6;
+    float brightSc = 0.55;
+
+    vec2 uv2 = (uv - vec2(0.5)) / brightSc + vec2(0.5);
+    return wideK * texture2D(lightTex, uv).xyz + innK * texture2D(lightTex, uv2).xyz;
+    // return texture2D(lightTex, uv2).xyz;
+    // return wideK * texture2D(lightTex, uv).xyz;
+}
 
 vec3 spotLight(float a, float b, float ac, vec3 spotPos) {
     vec3 v = vec3(0.0, -1.0, 0.0);
@@ -38,7 +50,8 @@ vec3 spotLight(float a, float b, float ac, vec3 spotPos) {
 
         x = (normalize(r) * k).x / 2.0 + 0.5;
         y = 1.0 - ((normalize(r) * k).z / 2.0 + 0.5);
-        return texture2D(lightTex, vec2(x, y)).xyz * intense;
+        // return texture2D(lightTex, vec2(x, y)).xyz * intense;
+        return sampleLightTex(vec2(x, y)) * intense;
     }
 
     float res = 0.0;
