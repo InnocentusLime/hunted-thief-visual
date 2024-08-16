@@ -212,7 +212,7 @@ async fn main() {
     let pos_buffer = render_target(1600, 900);
     pos_buffer.texture.set_filter(FilterMode::Nearest);
 
-    let light = load_texture("assets/light6.png").await.unwrap();
+    let light = load_texture("assets/light7.png").await.unwrap();
     let floor = [
         load_texture("assets/grass1.png").await.unwrap(),
         load_texture("assets/grass2.png").await.unwrap(),
