@@ -217,6 +217,7 @@ async fn main() {
                 ("lightPos".to_string(), UniformType::Float3),
                 ("Normal".to_string(), UniformType::Float3),
                 ("time".to_string(), UniformType::Float1),
+                ("lightPo".to_string(), UniformType::Float1),
             ],
             pipeline_params: PipelineParams {
                 depth_test: Comparison::Never,
@@ -240,6 +241,7 @@ async fn main() {
     let mut lz = 1.5;
 
     let mut t = 0.0f32;
+    let mut powe = 0.0f32;
 
     loop {
         t += 0.01;
@@ -279,6 +281,14 @@ async fn main() {
             lz += 0.02;
         }
 
+        if is_key_down(KeyCode::Z) {
+            powe += 0.03;
+        }
+        if is_key_down(KeyCode::X) {
+            powe -= 0.03;
+        }
+        powe = powe.clamp(0.0, 1.0);
+
         clear_background(BLACK);
         // clear_background(
         //     Color::new(
@@ -312,6 +322,7 @@ async fn main() {
         material.set_texture("lightTex", light.clone());
         material.set_uniform("lightPos", light_pos);
         material.set_uniform("time", t);
+        material.set_uniform("lightPo", powe);
 
         draw_map(&floor, &wall, &wall_crease, &material, &player, light_pos);
 

@@ -11,6 +11,7 @@ uniform lowp vec3 lightPos;
 uniform sampler2D Texture;
 uniform sampler2D lightTex;
 uniform float time;
+uniform float lightPo;
 
 // float random (vec2 st) {
 //     return fract(sin(dot(st.xy,
@@ -98,8 +99,9 @@ void main() {
     vec3 darkLightPos = vec3(0.0, 1.2, 1.5);
     vec2 darkLightDelta = (lightPos.xz - darkLightPos.xz) * 0.3;
 
-    vec3 darkLight = spotLight(0.1, 0.1, 0.3, darkLightPos + vec3(darkLightDelta.x, 0.0, darkLightDelta.y));
-    vec3 lantern = spotLight(0.1, 0.01, 0.42, vec3(lightPos.x, 0.3, lightPos.z));
+    float k = pow(lightPo, 3.0);
+    vec3 darkLight = spotLight(0.1, 0.1, k * 0.7 + 0.3, darkLightPos + vec3(darkLightDelta.x, 0.0, darkLightDelta.y));
+    vec3 lantern = spotLight(0.1, 0.01, k * 0.58 + 0.42, vec3(lightPos.x, 0.3, lightPos.z));
 
     vec4 final = vec4(darkLight, 1.0) * texture2D(Texture, uv);
     vec3 biglit = blend(darken(dark, final.rgb), final.rgb, min(0.65, 1 - length(lantern)));
