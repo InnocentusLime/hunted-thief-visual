@@ -10,6 +10,7 @@ varying lowp vec3 fragRight;
 uniform lowp vec3 lightPos;
 uniform sampler2D Texture;
 uniform sampler2D lightTex;
+uniform sampler2D noise;
 uniform float time;
 uniform float lightPo;
 
@@ -18,6 +19,11 @@ uniform float lightPo;
 //                          vec2(12.9898,78.233)))*
 //         43758.5453123);
 // }
+
+//	Classic Perlin 2D Noise
+//	by Stefan Gustavson (https://github.com/stegu/webgl-noise)
+//
+vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
 
 float randomF(float x) {
     return fract(sin(dot(vec2(x, x),
@@ -31,11 +37,12 @@ vec3 sampleLightTex(vec2 uv, bool shif) {
     float brightSc = 0.55;
 
     vec2 uv2 = (uv - vec2(0.5)) / brightSc + vec2(0.5);
+    uv2 = uv2.yx;
 
-    vec2 uvShear = vec2(randomF(time), randomF(time + 0.23) - 0.5) * 0.02;
-    vec2 uvShear2 = vec2(randomF(time + 0.12) - 0.5, randomF(time + 0.4) - 0.5) * 0.02;
+    vec2 uvShear = vec2(randomF(time), randomF(time + 0.23) - 0.5) * 0.06;
+    vec2 uvShear2 = vec2(randomF(time + 0.12) - 0.5, randomF(time + 0.4) - 0.5) * 0.06;
     if (shif) {
-        innK += (randomF(time) - 0.5) * 0.05;
+        innK += (randomF(time) - 0.5) * 0.22;
     }
 
     uv = uv + uvShear.yx * uv;

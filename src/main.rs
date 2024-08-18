@@ -203,6 +203,7 @@ async fn main() {
     let wall = load_texture("assets/wall2.png").await.unwrap();
     let wall_crease = load_texture("assets/wall_crease.png").await.unwrap();
     let player = load_texture("assets/char.png").await.unwrap();
+    let perlin = load_texture("assets/Perlin_18.png").await.unwrap();
 
     let material = load_material(
         ShaderSource::Glsl {
@@ -211,7 +212,8 @@ async fn main() {
         },
         MaterialParams {
             textures: vec![
-                "lightTex".to_string()
+                "lightTex".to_string(),
+                "noise".to_string(),
             ],
             uniforms: vec![
                 ("lightPos".to_string(), UniformType::Float3),
@@ -320,6 +322,7 @@ async fn main() {
         let light_pos = vec3(lx, 0.3, lz);
         gl_use_material(&material);
         material.set_texture("lightTex", light.clone());
+        material.set_texture("noise", perlin.clone());
         material.set_uniform("lightPos", light_pos);
         material.set_uniform("time", t);
         material.set_uniform("lightPo", powe);
