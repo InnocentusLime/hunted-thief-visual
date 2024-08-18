@@ -31,13 +31,22 @@ float randomF(float x) {
         43758.5453123);
 }
 
+float samplePeriodicNoise(vec2 uv) {
+    return length(texture2D(noise, mod(uv, 1.0)).rgb);
+}
+
+float candleNoiseChan(float x, float y) {
+    return samplePeriodicNoise(vec2(x * 0.5, y)) * 0.8 +
+            samplePeriodicNoise(vec2(x * 4.0, y)) * 0.2;
+}
+
 vec4 candleNoise(float x) {
-    return vec4(
-        randomF(x),
-        randomF(x + 0.23),
-        randomF(x + 0.12),
-        randomF(x + 0.4)
-    );
+    float n1 = candleNoiseChan(x, 0.2);
+    float n2 = candleNoiseChan(x, 0.3);
+    float n3 = candleNoiseChan(x, 0.4);
+    float n4 = candleNoiseChan(x, 0.5);
+
+    return vec4(n1, n2, n3, n4);
 }
 
 vec3 sampleLightTex(vec2 uv, bool shif) {
