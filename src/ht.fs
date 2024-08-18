@@ -14,23 +14,6 @@ uniform sampler2D noise;
 uniform float time;
 uniform float lightPo;
 
-// float random (vec2 st) {
-//     return fract(sin(dot(st.xy,
-//                          vec2(12.9898,78.233)))*
-//         43758.5453123);
-// }
-
-//	Classic Perlin 2D Noise
-//	by Stefan Gustavson (https://github.com/stegu/webgl-noise)
-//
-vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
-
-float randomF(float x) {
-    return fract(sin(dot(vec2(x, x),
-                         vec2(12.9898,78.233)))*
-        43758.5453123);
-}
-
 float samplePeriodicNoise(vec2 uv) {
     return texture2D(noise, mod(uv, 1.0)).r;
 }
@@ -38,15 +21,16 @@ float samplePeriodicNoise(vec2 uv) {
 float candleNoiseChan(float x, float y) {
     float lfha = 2.0 * (samplePeriodicNoise(vec2(x * 0.67, y)) - 0.5) * 1.1;
     float hfla = 2.0 * (samplePeriodicNoise(vec2(x * 4.0, y)) - 0.5) * 0.3;
+    float extra = 2.0 * (samplePeriodicNoise(vec2(x * 4.8, y)) - 0.5) * 0.1;
 
-    return lfha + hfla;
+    return lfha + hfla + extra;
 }
 
 vec4 candleWiggleNoise(float x) {
     float n1 = candleNoiseChan(x, 0.2);
-    float n2 = candleNoiseChan(x, 0.3);
-    float n3 = candleNoiseChan(x, 0.4);
-    float n4 = candleNoiseChan(x, 0.5);
+    float n2 = candleNoiseChan(x + 0.2, 0.3);
+    float n3 = candleNoiseChan(x - 0.1, 0.4);
+    float n4 = candleNoiseChan(x + 0.8, 0.5);
 
     return vec4(n1, n2, n3, n4) * vec4(0.06);
 }
