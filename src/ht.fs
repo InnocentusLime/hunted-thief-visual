@@ -130,7 +130,7 @@ void main() {
 
     float k = pow(lightPo, 3.0);
     vec3 darkLight = spotLight(0.1, 0.1, k * 0.7 + 0.3, darkLightPos + vec3(darkLightDelta.x, 0.0, darkLightDelta.y));
-    vec3 lantern = spotLight(0.1, 0.01, k * 0.58 + 0.42, vec3(lightPos.x, 0.3, lightPos.z));
+    vec3 lantern = spotLight(0.1, 0.01, k * 0.58 + 0.42, vec3(lightPos.x, 0.3, lightPos.z - 0.05));
 
     vec4 final = vec4(darkLight, 1.0) * texture2D(Texture, uv);
     vec3 biglit = blend(darken(dark, final.rgb), final.rgb, min(0.65, 1 - length(lantern)));
