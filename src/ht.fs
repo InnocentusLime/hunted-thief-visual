@@ -31,6 +31,15 @@ float randomF(float x) {
         43758.5453123);
 }
 
+vec4 candleNoise(float x) {
+    return vec4(
+        randomF(x),
+        randomF(x + 0.23),
+        randomF(x + 0.12),
+        randomF(x + 0.4)
+    );
+}
+
 vec3 sampleLightTex(vec2 uv, bool shif) {
     float innK = 0.4;
     float wideK = 0.6;
@@ -39,8 +48,9 @@ vec3 sampleLightTex(vec2 uv, bool shif) {
     vec2 uv2 = (uv - vec2(0.5)) / brightSc + vec2(0.5);
     uv2 = uv2.yx;
 
-    vec2 uvShear = vec2(randomF(time), randomF(time + 0.23) - 0.5) * 0.06;
-    vec2 uvShear2 = vec2(randomF(time + 0.12) - 0.5, randomF(time + 0.4) - 0.5) * 0.06;
+    vec4 cn = candleNoise(time);
+    vec2 uvShear = (cn.xy - vec2(0.5)) * 0.06;
+    vec2 uvShear2 = (cn.zw - vec2(0.5)) * 0.06;
     if (shif) {
         innK += (randomF(time) - 0.5) * 0.22;
     }
