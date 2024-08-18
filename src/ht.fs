@@ -36,7 +36,7 @@ float samplePeriodicNoise(vec2 uv) {
 }
 
 float candleNoiseChan(float x, float y) {
-    float lfha = 2.0 * (samplePeriodicNoise(vec2(x * 0.5, y)) - 0.5) * 1.1;
+    float lfha = 2.0 * (samplePeriodicNoise(vec2(x * 0.67, y)) - 0.5) * 1.1;
     float hfla = 2.0 * (samplePeriodicNoise(vec2(x * 4.0, y)) - 0.5) * 0.3;
 
     return lfha + hfla;
@@ -63,7 +63,8 @@ vec3 sampleLightTex(vec2 uv, bool shif) {
     vec2 uvShear = cn.xy;
     vec2 uvShear2 = cn.zw;
     if (shif) {
-        innK += (randomF(time) - 0.5) * 0.22;
+        innK += (samplePeriodicNoise(vec2(time * 2.0, 0.45)) - 0.5) * 0.22;
+        wideK += (samplePeriodicNoise(vec2(time * 2.0, 0.65)) - 0.5) * 0.08;
     }
 
     uv = uv + uvShear * (uv.yx - vec2(0.5));
