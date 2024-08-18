@@ -32,12 +32,12 @@ float randomF(float x) {
 }
 
 float samplePeriodicNoise(vec2 uv) {
-    return length(texture2D(noise, mod(uv, 1.0)).rgb);
+    return texture2D(noise, mod(uv, 1.0)).r;
 }
 
 float candleNoiseChan(float x, float y) {
-    float lfha = (samplePeriodicNoise(vec2(x * 0.5, y)) - 0.5) * 1.1;
-    float hfla = (samplePeriodicNoise(vec2(x * 4.0, y)) - 0.5) * 0.3;
+    float lfha = 2.0 * (samplePeriodicNoise(vec2(x * 0.5, y)) - 0.5) * 1.1;
+    float hfla = 2.0 * (samplePeriodicNoise(vec2(x * 4.0, y)) - 0.5) * 0.3;
 
     return lfha + hfla;
 }
@@ -66,8 +66,8 @@ vec3 sampleLightTex(vec2 uv, bool shif) {
         innK += (randomF(time) - 0.5) * 0.22;
     }
 
-    uv = uv + uvShear.yx * uv;
-    uv2 = uv2 + uvShear2.yx * uv2;
+    uv = uv + uvShear * (uv.yx - vec2(0.5));
+    uv2 = uv2 + uvShear2 * (uv2.yx - vec2(0.5));
     return wideK * texture2D(lightTex, uv).xyz + innK * texture2D(lightTex, uv2).xyz;
 }
 

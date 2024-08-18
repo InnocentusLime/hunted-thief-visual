@@ -203,7 +203,7 @@ async fn main() {
     let wall = load_texture("assets/wall2.png").await.unwrap();
     let wall_crease = load_texture("assets/wall_crease.png").await.unwrap();
     let player = load_texture("assets/char.png").await.unwrap();
-    let perlin = load_texture("assets/Perlin_18.png").await.unwrap();
+    let perlin = load_texture("assets/Perlin_18_1.png").await.unwrap();
 
     let material = load_material(
         ShaderSource::Glsl {
