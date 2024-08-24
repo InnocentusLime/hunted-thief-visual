@@ -84,28 +84,36 @@ float spotLight(float a, float b, float ac, vec3 spotPos) {
     vec3 h = (dot(p, v) / dot(v, v)) * v;
     vec3 r = p - h;
 
-    float bc = sqrt(1 - ac*ac);
-    float fb = (bc / ac) * length(h);
-    float k = length(r) / fb;
-
-    float x = (normalize(r) * k).x / 2.0 + 0.5;
-    float y = 1.0 - ((normalize(r) * k).z / 2.0 + 0.5);
-
     // compute
     float intense = 0.0;
+
+    /* The noise nudge */
     float rk = samplePeriodicNoise(vec2(time / 4.0, time / 4.0));
     float rotK = samplePeriodicNoise3(vec2(time / 5.9, time / 5.9));
     vec2 noiseVect = rotate((rk * 0.6 + rotK * 0.4) * 2 * 3.14) * normalize(r.xz) * (rk * 0.4);
-    vec2 noiseVect2 = (rotate((rk * 0.6) * 2 * 3.14) * vec2(x - 0.5, y - 0.5) + vec2(0.5, 0.5)) * 0.8;
     float dac = (samplePeriodicNoise(noiseVect) - 0.5) * 0.05;
-    float dac2 = 0.0;
+
+    /* "drawn" nudge */
+    float bc = sqrt(1 - (ac + dac)*(ac + dac));
+    float fb = (bc / (ac + dac)) * length(h);
+    float k = length(r) / fb;
+
+    float nudgeV = ((1 - k) + 0.43) / 1.1;
+    float r_ang = atan(normalize(r).z, normalize(r).x);
+    float nudgeU = mod((r_ang / 3.14 + 1.0) / 2.0 * 2.0, 1.0);
+    vec2 lVec = vec2(nudgeU, nudgeV);
+    float dac2 = texture2D(lightTex, lVec).r;
+    // dac2 = 0.0;
+
     vec3 np = normalize(p);
     if (dot(np, v) > ac + dac + dac2) {
         float Diff = clamp(dot(NfragNormal, -p), 0.0, 1.0);
 
         intense = 1.0 / (1.0 + a * lightDist + b * lightDist * lightDist);
+        intense *= pow(smoothstep(ac + dac + dac2, 1.0, dot(np, v)), 0.3);
 
-        return sampleLightTex(vec2(x, y), ac > 0.3) * intense;
+        // return sampleLightTex(vec2(x, y), ac > 0.3) * intense;
+        return intense;
     }
 
     return 0.0;
@@ -134,11 +142,11 @@ void main() {
 
     float k = pow(lightPo, 3.0);
     float darkLight = spotLight(0.1, 0.1, k * 0.7 + 0.3, darkLightPos + vec3(darkLightDelta.x, 0.0, darkLightDelta.y));
-    float lantern = spotLight(0.1, 0.01, k * 0.58 + 0.42, vec3(lightPos.x, 0.3, lightPos.z - 0.05));
+    float lantern = spotLight(0.1, 0.1, k * 0.58 + 0.42, vec3(lightPos.x, 0.3, lightPos.z - 0.05));
 
     vec4 tex = texture2D(Texture, uv);
     vec3 col = tex.rgb;
-    vec3 final = blend(darken(dark, col * darkLight), col * darkLight, 0.65) * float(lantern == 0.0) +
+    vec3 final = blend(darken(dark, col * darkLight), col * darkLight, 0.65) * (1.0 - lantern) +
                  blend(light * lantern * col, col * lantern, 0.33) * float(lantern > 0.0);
     // vec4 final = vec4(vec3(darkLight), 1.0) * ;
     // vec3 biglit = blend(darken(dark, final.rgb), final.rgb, float(lantern == 0.0));
