@@ -204,6 +204,7 @@ async fn main() {
     let wall_crease = load_texture("assets/wall_crease.png").await.unwrap();
     let player = load_texture("assets/char.png").await.unwrap();
     let perlin = load_texture("assets/Perlin_18_1.png").await.unwrap();
+    let rough = load_texture("assets/roughN.png").await.unwrap();
 
     let material = load_material(
         ShaderSource::Glsl {
@@ -214,6 +215,7 @@ async fn main() {
             textures: vec![
                 "lightTex".to_string(),
                 "noise".to_string(),
+                "roughNoise".to_string(),
             ],
             uniforms: vec![
                 ("lightPos".to_string(), UniformType::Float3),
@@ -323,6 +325,7 @@ async fn main() {
         gl_use_material(&material);
         material.set_texture("lightTex", light.clone());
         material.set_texture("noise", perlin.clone());
+        material.set_texture("roughNoise", rough.clone());
         material.set_uniform("lightPos", light_pos);
         material.set_uniform("time", t);
         material.set_uniform("lightPo", powe);
@@ -375,7 +378,7 @@ async fn main() {
     }
 }
 
-const HT_FRAG: &'static str = include_str!("ht.fs");
+const HT_FRAG: &'static str = include_str!("ht-new.fs");
 
 const HT_VERT: &'static str = r#"#version 100
 precision lowp float;
